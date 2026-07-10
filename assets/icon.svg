@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Daybook">
+  <rect width="512" height="512" rx="96" fill="#0c1420"/>
+  <g stroke="#1c2c3f" stroke-width="2">
+    <path d="M64 128H448M64 192H448M64 256H448M64 320H448M64 384H448"/>
+    <path d="M128 64V448M192 64V448M256 64V448M320 64V448M384 64V448"/>
+  </g>
+  <circle cx="256" cy="256" r="132" fill="none" stroke="#38516c" stroke-width="10"/>
+  <path d="M256 148a108 108 0 1 0 92 164 132 132 0 0 1-92-164z" fill="#3bb6e6"/>
+  <circle cx="256" cy="256" r="150" fill="none" stroke="#ff7d33" stroke-width="8" stroke-dasharray="6 14" stroke-linecap="round"/>
+  <circle cx="256" cy="106" r="12" fill="#ff7d33"/>
+</svg>

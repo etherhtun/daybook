@@ -1,0 +1,14 @@
+{
+  "name": "Daybook",
+  "short_name": "Daybook",
+  "description": "Your personal daily portal.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0c1420",
+  "theme_color": "#0c1420",
+  "icons": [
+    { "src": "/assets/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

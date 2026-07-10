@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Daybook</title>
+<meta name="theme-color" content="#0c1420">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/assets/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/icon.svg">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Daybook">
+<link rel="stylesheet" href="/assets/css/app.css">
+<script src="/api/v1/client-config"></script>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <span class="brand"><img src="/assets/icon.svg" alt=""> Daybook</span>
+      <span class="right">
+        <span id="clock" class="mono"></span>
+        <button class="iconbtn" id="themeBtn" type="button" aria-label="Toggle theme">◐</button>
+      </span>
+    </div>
+    <main id="view"><div class="loading">Loading…</div></main>
+  </div>
+  <nav class="bottomnav" id="nav" aria-label="Sections"></nav>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script type="module" src="/assets/js/app.js"></script>
+</body>
+</html>

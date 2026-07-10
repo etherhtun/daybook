@@ -1,0 +1,19 @@
+# Copy to `.dev.vars` for local development (gitignored).
+# In production these are set as Cloudflare Pages environment variables / secrets.
+
+# Shared secret the browser fetches via /api/v1/client-config and sends as X-API-Token.
+# Use any long random string for local dev.
+API_TOKEN=dev-local-token-change-me
+
+# Your email — becomes the "admin" (can manage users later). Optional for local.
+ADMIN_EMAIL=you@example.com
+
+# LOCAL-ONLY: `wrangler pages dev` has no Cloudflare Access in front of it, so no
+# identity header arrives. When set, the API treats every local request as this
+# user — lets you exercise real per-user flows offline. NEVER set this in production
+# (production identity comes from Cloudflare Access). Change it to test multi-user
+# isolation: two different emails => two separate datasets.
+DEV_EMAIL=you@example.com
+
+# Optional: pin the Cloudflare Access Application Audience (AUD) tag for JWT verify.
+# CF_ACCESS_AUD=
