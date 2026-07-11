@@ -8,8 +8,5 @@
     "deploy": "wrangler pages deploy .",
     "db:init:local": "wrangler d1 execute daybook --local --file=migrations/0001_core.sql && wrangler d1 execute daybook --local --file=migrations/0002_modules.sql",
     "db:init:remote": "wrangler d1 execute daybook --remote --file=migrations/0001_core.sql && wrangler d1 execute daybook --remote --file=migrations/0002_modules.sql"
-  },
-  "devDependencies": {
-    "wrangler": "^4.0.0"
   }
 }

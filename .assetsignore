@@ -1,0 +1,17 @@
+# Files present in the repo/output dir but NOT served as static assets.
+# (Cloudflare Pages treats the whole output dir as assets; exclude the rest.)
+node_modules
+.git
+.wrangler
+*.log
+migrations
+package.json
+package-lock.json
+wrangler.toml
+wrangler.toml.template
+.dev.vars
+.dev.vars.example
+.gitignore
+.assetsignore
+CLAUDE.md
+SETUP.md
