@@ -1,18 +1,23 @@
-# Daybook — Cloudflare Pages config TEMPLATE
-# Copy to `wrangler.toml` and fill in the IDs from YOUR Cloudflare account.
-# See SETUP.md for the exact commands that generate these IDs.
+# Daybook — Cloudflare Worker config TEMPLATE.
+# For your OWN deploy you can just edit wrangler.toml directly (it's committed).
+# This template is for a fresh account: fill in the IDs from `wrangler d1 create`
+# and `wrangler kv namespace create` (see SETUP.md).
 
 name = "daybook"
-compatibility_date = "2024-01-01"
-pages_build_output_dir = "."
+main = "worker.js"
+compatibility_date = "2025-06-01"
 
-# Key-value store (JWKS cache, per-user light caches)
-[[kv_namespaces]]
-binding = "DAYBOOK_KV"
-id = "{{KV_ID}}"
+[assets]
+directory = "."
+binding = "ASSETS"
+not_found_handling = "single-page-application"
+run_worker_first = ["/api/*"]
 
-# D1 (SQLite) — the source of truth for all user data
 [[d1_databases]]
 binding = "DB"
 database_name = "daybook"
 database_id = "{{DB_ID}}"
+
+[[kv_namespaces]]
+binding = "DAYBOOK_KV"
+id = "{{KV_ID}}"

@@ -25,15 +25,15 @@ project. Conventions were borrowed from `kairos-optix` but the infra is separate
 
 | Layer | Technology |
 |---|---|
-| Hosting | Cloudflare Pages (static files + Pages Functions) |
-| Functions runtime | Cloudflare Workers (V8 isolates — no Node.js APIs) |
+| Hosting | Cloudflare **Worker** with static assets (`worker.js` + `[assets]`) |
+| API runtime | Cloudflare Workers (V8 isolates — no Node.js APIs) |
 | Database | Cloudflare **D1** (SQLite), binding `DB`, database `daybook` — source of truth |
 | Key-value | Cloudflare **KV**, binding `DAYBOOK_KV` — JWKS + identity cache only |
 | Auth (login) | **Cloudflare Access** (verified email) in front of everything |
-| Auth (API) | `X-API-Token` header, validated in `_middleware.js` |
+| Auth (API) | `X-API-Token` header, validated in `worker.js` |
 | Frontend | Vanilla JS single-page app, no framework, **no build step** |
-| Local dev | `wrangler pages dev . --port 8790` |
-| Deploy | Git auto-deploy (Cloudflare ↔ GitHub) or `npm run deploy` |
+| Local dev | `wrangler dev --port 8790` (serves API + static assets) |
+| Deploy | Git auto-deploy (Cloudflare ↔ GitHub, `wrangler deploy`) or `npm run deploy` |
 
 **Explicitly NOT used:** Node.js runtime APIs, any framework/bundler, TypeScript build,
 Postgres/Redis, WebSockets. Keep it dependency-light and buildless.
@@ -43,19 +43,21 @@ Postgres/Redis, WebSockets. Keep it dependency-light and buildless.
 ## Project Layout
 
 ```
-wrangler.toml.template   ← committed; {{DB_ID}}/{{KV_ID}} placeholders (SETUP.md fills them)
-wrangler.toml            ← gitignored (real/local IDs)
+wrangler.toml            ← committed Worker config: main=worker.js, [assets], D1/KV bindings
+wrangler.toml.template   ← same, with {{DB_ID}}/{{KV_ID}} placeholders for a fresh account
 .dev.vars.example        ← committed; .dev.vars is gitignored (secrets)
-SETUP.md                 ← one-time Cloudflare provisioning (D1/KV/Pages/Access)
+.assetsignore            ← keeps worker.js/functions/tooling out of the static-asset upload
+SETUP.md                 ← one-time Cloudflare provisioning (D1/KV/Worker/Access)
 _headers                 ← CSP/HSTS; no-cache on sw.js + manifest
 manifest.webmanifest  sw.js  index.html
 migrations/              ← 0001_core.sql, 0002_modules.sql (apply via wrangler d1 execute)
+worker.js                ← Worker entry: routes /api/v1/* to handlers, else serves static
 assets/
   css/app.css            ← blueprint design tokens (navy/steel + orange/cyan, light+dark)
   js/ app.js  api.js  modules/{home,health,tasks,habits,journal,money,family,setup}.js
-functions/
-  api/v1/  _middleware.js  client-config.js  health-check.js  whoami.js  settings.js
-           health.js  tasks.js  habits.js  journal.js  money.js  family.js  dashboard.js
+functions/                 ← API handler modules (bundled into worker.js; not Pages Functions)
+  api/v1/  client-config.js  health-check.js  whoami.js  settings.js
+           health.js  tasks.js  habits.js  journal.js  dashboard.js
   lib/     auth.js  db.js  config.js  ids.js
 ```
 
@@ -102,11 +104,11 @@ user's config, not constants. Defaults live once in `lib/config.js` (`DEFAULT_CO
 1. Cloudflare Access authenticates the visitor and injects
    `Cf-Access-Authenticated-User-Email` (or only `Cf-Access-Jwt-Assertion` on custom
    domains — verified via JWKS in `lib/auth.js:verifyAccessJwt`).
-2. `_middleware.js` checks `X-API-Token`, resolves identity, attaches `data.identity`
+2. `worker.js` checks `X-API-Token`, resolves identity, attaches `data.identity`
    (`{ kind, email, uid, displayName, role, status }`), and injects CORS.
 3. `resolveIdentity` lazily provisions a `users` row on first sign-in
    (`getOrCreateUser`, KV-cached 1h). `ADMIN_EMAIL` is break-glass admin.
-4. **Local dev:** no Access in front, so `_middleware.js` falls back to `env.DEV_EMAIL`
+4. **Local dev:** no Access in front, so `worker.js` falls back to `env.DEV_EMAIL`
    (set only in `.dev.vars`) as the identity. Change `DEV_EMAIL` to test isolation.
    `DEV_EMAIL` must never be set in production.
 
@@ -118,8 +120,9 @@ cache after changing display name/role.
 ## Adding a Module (the pattern)
 
 1. **Data:** add a table in a new `migrations/000N_*.sql` (with `user_id` + indexes).
-2. **API:** add `functions/api/v1/<module>.js` — one file, method-branch or
-   `onRequestGet/Post/...`, scoped to `currentUser(data).uid`, `{ok,error}` envelope.
+2. **API:** add `functions/api/v1/<module>.js` — one file exporting `onRequest` (or
+   `onRequestGet/Post/...`), scoped to `currentUser(data).uid`, `{ok,error}` envelope.
+   Then register it in the `ROUTES` map in `worker.js`.
 3. **Config:** add defaults under the module's key in `DEFAULT_CONFIG`.
 4. **Frontend:** add `assets/js/modules/<module>.js` (render + `apiFetch`), register it in
    `app.js`, and expose its settings in `modules/setup.js`.
@@ -141,7 +144,7 @@ Inspect local data:
 wrangler d1 execute daybook --local --command "SELECT * FROM tasks"
 ```
 
-Full Cloudflare provisioning (D1/KV/Pages/Access) is in **SETUP.md**.
+Full Cloudflare provisioning (D1/KV/Worker/Access) is in **SETUP.md**.
 
 ---
 

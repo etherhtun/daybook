@@ -1,6 +1,6 @@
 # Daybook — Setup
 
-Daybook is a personal daily portal: **Cloudflare Pages + D1 + KV**, gated by **Cloudflare Access**, installable as a phone PWA. It runs entirely in *your* Cloudflare account — nothing is shared with any other project.
+Daybook is a personal daily portal: a **Cloudflare Worker + static assets + D1 + KV**, gated by **Cloudflare Access**, installable as a phone PWA. It runs entirely in *your* Cloudflare account — nothing is shared with any other project.
 
 Everything below is a one-time setup. You can develop and test **locally without any of it** (see *Local development*).
 
@@ -42,12 +42,9 @@ npx wrangler d1 create daybook
 npx wrangler kv namespace create DAYBOOK_KV
 ```
 
-Then:
-
-```bash
-cp wrangler.toml.template wrangler.toml
-# edit wrangler.toml: paste the real database_id -> {{DB_ID}}, kv id -> {{KV_ID}}
-```
+Then edit **`wrangler.toml`** and paste your real IDs over the `{{DB_ID}}` / `{{KV_ID}}`
+placeholders (the D1 `database_id` and the KV `id`). `wrangler.toml` is committed, so the
+Worker build reads its **bindings straight from this file** — no dashboard binding step.
 
 Apply the schema to the **remote** database:
 
@@ -57,18 +54,21 @@ npm run db:init:remote
 
 ---
 
-## 3. Create the Pages project + connect GitHub (auto-deploy)
+## 3. Create the Worker + connect GitHub (auto-deploy)
+
+Daybook is a **Cloudflare Worker with static assets** (`worker.js` serves the API; the
+`[assets]` block serves the front-end). Bindings come from the committed `wrangler.toml`.
 
 1. Push this folder to a new GitHub repo (`daybook`).
-2. Cloudflare dashboard → **Workers & Pages → Create → Pages → Connect to Git** → pick the repo.
-3. Build settings: **Framework preset = None**, **Build command = (empty)**, **Build output directory = `/`**. (No build step.)
-4. In the Pages project → **Settings → Bindings**, add:
-   - D1 database binding **`DB`** → the `daybook` database.
-   - KV namespace binding **`DAYBOOK_KV`** → the namespace you created.
-5. In **Settings → Environment variables / Secrets**, add:
-   - `API_TOKEN` — a long random string (the browser fetches it via `/api/v1/client-config`).
+2. Cloudflare dashboard → **Workers & Pages → Create → Workers → Import a repository** → pick the repo.
+3. Build settings: **Build command = (empty)**, **Deploy command = `npx wrangler deploy`**, **Root directory = `/`**. (No build step.)
+4. Deploy. The D1 `DB` and KV `DAYBOOK_KV` bindings are picked up from `wrangler.toml` automatically.
+5. In the Worker → **Settings → Variables and Secrets**, add:
+   - `API_TOKEN` — a long random string (the browser fetches it via `/api/v1/client-config`). Mark it **Secret**.
    - `ADMIN_EMAIL` — your email.
    - *(optional)* `CF_ACCESS_AUD` — the Access Application Audience tag (step 4).
+   - **Do NOT** set `DEV_EMAIL` in production — it's a local-only bypass.
+6. Re-deploy so the variables apply (**Deployments → Retry**, or push a commit).
 
 Every push to the connected branch now auto-deploys.
 
@@ -77,7 +77,7 @@ Every push to the connected branch now auto-deploys.
 ## 4. Put Cloudflare Access in front (this is your login)
 
 1. Cloudflare **Zero Trust → Access → Applications → Add → Self-hosted**.
-2. Application domain = your Pages domain (e.g. `daybook.pages.dev` or your custom domain).
+2. Application domain = your Worker domain (e.g. `daybook.<subdomain>.workers.dev` or your custom domain).
 3. Add a policy: **Allow**, include the emails you want (yourself, and anyone you invite — each gets their own private Daybook).
 4. *(optional but recommended)* copy the Application **Audience (AUD) tag** into the `CF_ACCESS_AUD` env var for stricter JWT verification.
 

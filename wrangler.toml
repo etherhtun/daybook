@@ -1,0 +1,23 @@
+# Daybook — Cloudflare Worker (with static assets) config.
+# Committed so the Worker build picks up bindings automatically. The D1/KV IDs
+# here are NOT secrets (useless without your account login). Real secrets
+# (API_TOKEN) are set as Worker variables in the dashboard, never here.
+
+name = "daybook"
+main = "worker.js"
+compatibility_date = "2025-06-01"
+
+[assets]
+directory = "."
+binding = "ASSETS"
+not_found_handling = "single-page-application"
+run_worker_first = ["/api/*"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "daybook"
+database_id = "c500545b-1141-4082-a806-d0246405de8c"
+
+[[kv_namespaces]]
+binding = "DAYBOOK_KV"
+id = "67dc5b0aad0c461597533f43fa37ec7d"

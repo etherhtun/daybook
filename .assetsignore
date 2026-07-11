@@ -1,12 +1,13 @@
-# Files present in the repo/output dir but NOT served as static assets.
-# (Cloudflare Pages treats the whole output dir as assets; exclude the rest.)
+# Files in the repo/output dir that must NOT be served as static assets.
+# (worker.js + functions/ are bundled into the Worker; the rest is tooling/docs.)
 node_modules
 .git
 .wrangler
 *.log
+worker.js
+functions
 migrations
 package.json
-package-lock.json
 wrangler.toml
 wrangler.toml.template
 .dev.vars
