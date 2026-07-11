@@ -5,3 +5,8 @@ wrangler.toml
 package-lock.json
 .DS_Store
 *.log
+
+.dev.vars*
+!.dev.vars.example
+.env*
+!.env.example
