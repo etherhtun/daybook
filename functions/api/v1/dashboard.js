@@ -13,7 +13,7 @@ export async function onRequestGet({ env, data }) {
     date: today,
     tasks:   { dueToday: 0, overdue: 0, next: [] },
     habits:  { active: 0, doneToday: 0 },
-    health:  { doneToday: 0, weight: null },
+    health:  { doneToday: 0, latest: null },
     journal: { doneToday: false },
     money:   { nextBill: null, spentThisMonth: 0 },
     family:  { upcoming: null },
@@ -41,13 +41,13 @@ export async function onRequestGet({ env, data }) {
     const hd = await db.prepare(`SELECT COUNT(*) AS n FROM habit_logs WHERE user_id = ? AND date = ?`).bind(u.uid, today).first();
     out.habits.doneToday = hd?.n || 0;
 
-    // Health — done check-ins today + latest weight
+    // Health — done check-ins today + most recent metric of any kind
     const hc = await db.prepare(`SELECT COUNT(*) AS n FROM checkins WHERE user_id = ? AND date = ? AND done = 1`).bind(u.uid, today).first();
     out.health.doneToday = hc?.n || 0;
-    const w = await db.prepare(
-      `SELECT value FROM metrics WHERE user_id = ? AND metric = 'weight' ORDER BY date DESC LIMIT 1`
+    const lm = await db.prepare(
+      `SELECT metric, value FROM metrics WHERE user_id = ? ORDER BY date DESC, rowid DESC LIMIT 1`
     ).bind(u.uid).first();
-    out.health.weight = w ? w.value : null;
+    out.health.latest = lm ? { metric: lm.metric, value: lm.value } : null;
 
     // Journal done today?
     const j = await db.prepare(`SELECT 1 AS x FROM journal WHERE user_id = ? AND date = ?`).bind(u.uid, today).first();

@@ -23,8 +23,16 @@ export async function renderHome(view, ctx) {
      <div class="big">${big}</div><div class="sub">${sub}</div></button>`;
 
   const tasksN = d.tasks.dueToday + d.tasks.overdue;
+  const metricDefs = ctx.settings?.health?.metrics || [];
+  let healthSub = 'items logged today';
+  if (d.health.latest) {
+    const def = metricDefs.find(x => (x.key || x) === d.health.latest.metric);
+    const label = def ? (def.label || def.key || def) : d.health.latest.metric;
+    const unit = def && def.unit ? ' ' + def.unit : '';
+    healthSub = `${label}: ${d.health.latest.value}${unit}`;
+  }
   const cards = [
-    card('health', 'Health', `${d.health.doneToday}`, d.health.weight != null ? `logged · ${d.health.weight} kg` : 'items logged today'),
+    card('health', 'Health', `${d.health.doneToday}`, healthSub),
     card('tasks', 'Tasks', `${tasksN}`, d.tasks.overdue ? `${d.tasks.overdue} overdue` : 'due today'),
     card('tasks', 'Habits', `${d.habits.doneToday}/${d.habits.active}`, 'done today'),
     card('journal', 'Journal', d.journal.doneToday ? 'Done' : '—', d.journal.doneToday ? 'entry saved' : 'write today'),
