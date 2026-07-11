@@ -4,7 +4,7 @@
 //  · other assets → stale-while-revalidate.
 // Bump CACHE on any shell change so clients refresh.
 
-const CACHE = 'daybook-shell-v2';
+const CACHE = 'daybook-shell-v3';
 const SHELL = [
   '/', '/index.html',
   '/assets/css/app.css',
@@ -14,6 +14,8 @@ const SHELL = [
   '/assets/js/modules/health.js',
   '/assets/js/modules/tasks.js',
   '/assets/js/modules/journal.js',
+  '/assets/js/modules/money.js',
+  '/assets/js/modules/family.js',
   '/assets/js/modules/setup.js',
   '/manifest.webmanifest',
   '/assets/icon.svg',

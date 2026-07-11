@@ -15,6 +15,8 @@ import * as dashboard from './functions/api/v1/dashboard.js';
 import * as tasks from './functions/api/v1/tasks.js';
 import * as habits from './functions/api/v1/habits.js';
 import * as journal from './functions/api/v1/journal.js';
+import * as money from './functions/api/v1/money.js';
+import * as family from './functions/api/v1/family.js';
 
 const ROUTES = {
   '/api/v1/client-config': clientConfig,
@@ -26,6 +28,8 @@ const ROUTES = {
   '/api/v1/tasks': tasks,
   '/api/v1/habits': habits,
   '/api/v1/journal': journal,
+  '/api/v1/money': money,
+  '/api/v1/family': family,
 };
 const OPEN = new Set(['/api/v1/client-config', '/api/v1/health-check']);
 

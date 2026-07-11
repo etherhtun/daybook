@@ -6,6 +6,8 @@ import { renderHealth } from './modules/health.js';
 import { renderTasks } from './modules/tasks.js';
 import { renderJournal } from './modules/journal.js';
 import { renderSetup } from './modules/setup.js';
+import { renderMoney } from './modules/money.js';
+import { renderFamily } from './modules/family.js';
 
 // ---- inline nav icons ----
 const IC = {
@@ -19,10 +21,7 @@ const IC = {
   setup: '<circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.5 5.5l2 2M16.5 16.5l2 2M18.5 5.5l-2 2M7.5 16.5l-2 2"/>',
 };
 
-const PLACEHOLDER = {
-  money:   ['Money & Bills', 'Daily spend log and upcoming bills.'],
-  family:  ['Family & Milestones', "Your kid's milestones and important dates."],
-};
+const PLACEHOLDER = {};
 
 const ctx = { me: null, settings: null, go, toast, refresh };
 
@@ -96,6 +95,8 @@ async function route() {
   if (key === 'health') return renderHealth(view, ctx);
   if (key === 'tasks') return renderTasks(view, ctx);
   if (key === 'journal') return renderJournal(view, ctx);
+  if (key === 'money') return renderMoney(view, ctx);
+  if (key === 'family') return renderFamily(view, ctx);
   if (key === 'setup') return renderSetup(view, ctx);
   if (key === 'more') return renderMore(view);
   if (PLACEHOLDER[key]) return renderPlaceholder(view, key);

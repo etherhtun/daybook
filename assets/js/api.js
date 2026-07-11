@@ -44,6 +44,17 @@ export const api = {
 
   getJournal:   (date)         => apiFetch('/journal' + (date ? `?date=${encodeURIComponent(date)}` : '')),
   saveJournal:  (entry)        => apiFetch('/journal', { method: 'POST', body: JSON.stringify(entry) }),
+
+  getMoney:     ()             => apiFetch('/money'),
+  addTxn:       (t)            => apiFetch('/money', { method: 'POST', body: JSON.stringify(t) }),
+  addBill:      (bill)         => apiFetch('/money', { method: 'POST', body: JSON.stringify({ kind: 'bill', ...bill }) }),
+  setBillActive:(id, active)   => apiFetch('/money', { method: 'PATCH', body: JSON.stringify({ kind: 'bill', id, active }) }),
+  delMoney:     (kind, id)     => apiFetch('/money', { method: 'DELETE', body: JSON.stringify({ kind, id }) }),
+
+  getFamily:    ()             => apiFetch('/family'),
+  addFamily:    (it)           => apiFetch('/family', { method: 'POST', body: JSON.stringify(it) }),
+  updateFamily: (id, fields)   => apiFetch('/family', { method: 'PATCH', body: JSON.stringify({ id, ...fields }) }),
+  delFamily:    (id)           => apiFetch('/family', { method: 'DELETE', body: JSON.stringify({ id }) }),
 };
 
 export { apiFetch };
